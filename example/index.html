@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaf Markdown Editor Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="editor-container">
+            <div class="toolbar">
+                <button data-command="bold">B</button>
+                <button data-command="italic">I</button>
+                <button data-command="heading">H</button>
+                <button data-command="link">Link</button>
+                <button data-command="list">List</button>
+            </div>
+            <div id="editor"></div>
+        </div>
+        <div class="preview-container">
+            <div id="preview"></div>
+        </div>
+    </div>
+    <script type="module" src="main.ts"></script>
+</body>
+</html> 
