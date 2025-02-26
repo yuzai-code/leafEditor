@@ -17,11 +17,11 @@ export { Editor, MarkdownParser };
  * @returns {Editor} 返回编辑器实例
  */
 export function createEditor(container: HTMLElement, options: Partial<{
-  initialValue: string;
-  theme: string;
+    initialValue: string;
+    theme: string;
 }> = {}) {
-  return new Editor({
-    container,
-    ...options
-  });
+    return new Editor({
+        container,
+        ...options
+    });
 } 
