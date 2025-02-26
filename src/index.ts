@@ -3,10 +3,10 @@
  * 导出编辑器核心类和工具函数，提供简单的工厂函数用于创建编辑器实例
  */
 
-import { Editor } from './core/editor';
+import { LeafEditor } from './core/editor';
 import { MarkdownParser } from './core/parser';
 
-export { Editor, MarkdownParser };
+export { LeafEditor, MarkdownParser };
 
 /**
  * 创建编辑器实例的工厂函数
@@ -17,11 +17,11 @@ export { Editor, MarkdownParser };
  * @returns {Editor} 返回编辑器实例
  */
 export function createEditor(container: HTMLElement, options: Partial<{
-  initialValue: string;
-  theme: string;
+    initialValue: string;
+    theme: string;
 }> = {}) {
-  return new Editor({
-    container,
-    ...options
-  });
+    return new LeafEditor({
+        container,
+        ...options
+    });
 } 

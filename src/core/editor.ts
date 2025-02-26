@@ -22,7 +22,7 @@ export interface EditorOptions {
  * Markdown编辑器核心类
  * @extends EventEmitter
  */
-export class Editor extends EventEmitter {
+export class LeafEditor extends EventEmitter {
     /** 编辑器容器元素 */
     private container: HTMLElement;
     /** 文本输入区域 */
