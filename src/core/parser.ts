@@ -37,10 +37,10 @@ export class MarkdownParser {
       [/\[(.+?)\]\((.+?)\)/g, match => `<a href="${match[2]}">${match[1]}</a>`],
       
       // Lists - 无序列表
-      [/^\- (.+)$/gm, match => `<li>${match[1]}</li>`],
+      [/^\- (.+)$/gm, match => `<li class="unordered">${match[1]}</li>`],
         
-       // 有序列表
-      [/^\d+\. (.+)$/gm, match => `<li>${match[1]}</li>`],
+      // 有序列表
+      [/^\d+\. (.+)$/gm, match => `<li class="ordered">${match[1]}</li>`],
       
       // Paragraphs - 段落
       [/^(?!<[^>]+>)(.+)$/gm, match => `<p>${match[1]}</p>`]
@@ -70,12 +70,24 @@ export class MarkdownParser {
   }
 
   /**
-   * 处理列表项，将连续的列表项包装在ul标签中
+   * 处理列表项，将连续的列表项包装在适当的列表标签中
    * @param {string} html - 包含列表项的HTML字符串
    * @returns {string} 处理后的HTML字符串
    * @private
    */
   private processList(html: string): string {
-    return html.replace(/(<li>.*?<\/li>\n?)+/g, match => `<ul>\n${match}</ul>`);
+    // 处理无序列表
+    html = html.replace(/(<li class="unordered">.*?<\/li>\n?)+/g, match => 
+      `<ul>\n${match}</ul>`
+    );
+    
+    // 处理有序列表
+    html = html.replace(/(<li class="ordered">.*?<\/li>\n?)+/g, match => {
+      // 移除class="ordered"标记
+      const cleanMatch = match.replace(/class="ordered"/g, '');
+      return `<ol>\n${cleanMatch}</ol>`;
+    });
+
+    return html;
   }
 } 
