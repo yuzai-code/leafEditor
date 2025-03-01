@@ -1,10 +1,10 @@
 <template>
- <Splitter class="min-h-screen">
+  <Splitter class="min-h-screen">
     <SplitterPanel :size="20" :minSize="10" class="bg-gray-50">
       <SidebarLayout />
     </SplitterPanel>
     <SplitterPanel :size="80" :minSize="50">
-      <EditorText class="h-full"/>
+      <EditorText class="h-full" />
     </SplitterPanel>
   </Splitter>
 </template>
