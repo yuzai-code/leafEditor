@@ -15,6 +15,11 @@ app.use(router)
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
+    options: {
+      prefix: 'p',
+      darkModeSelector: 'system',
+      cssLayer: false
+  }
   },
 })
 
