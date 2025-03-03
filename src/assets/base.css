@@ -84,3 +84,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.sidebar-container {
+  height: 100%;
+}
+
+.tree-component {
+  width: 100%;
+}
+
+/* 自定义树组件样式 */
+:deep(.p-tree) {
+  border: none;
+  padding: 0.5rem;
+}
+
+:deep(.p-tree-container) {
+  margin: 0;
+}
