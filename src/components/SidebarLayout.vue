@@ -64,7 +64,7 @@ const testData: TreeNode[] = [
 const nodes = ref<TreeNode[]>(testData);
 
 // 菜单引用
-const menu = ref<unknown>(null);
+const menu = ref()
 
 // 当前选中的节点
 const selectedNode = ref<TreeNode | null>(null);
@@ -72,7 +72,7 @@ const selectedNode = ref<TreeNode | null>(null);
 // 菜单项
 const menuItems = ref<MenuItem[]>([]);
 
-// 点击“三个点”时显示菜单
+// 点击三个点时显示菜单
 const toggleMenu = (event: Event, node: TreeNode) => {
   selectedNode.value = node;
   menuItems.value = [
