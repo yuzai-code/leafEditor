@@ -1,3 +1,9 @@
+// 创建分类请求参数
+export interface CreateCategoryRequest {
+  name: string
+  parent_id: number
+}
+
 // 创建笔记请求参数
 export interface CreateNoteRequest {
   title: string
@@ -57,8 +63,8 @@ export interface GetNoteDetailResponse {
 
 // 笔记分类
 export interface Category {
-  id: number
   name: string
+  parent_id: number
 }
 
 // 笔记标签

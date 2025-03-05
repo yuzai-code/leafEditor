@@ -28,6 +28,7 @@ import Tree from 'primevue/tree';
 import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import type { TreeNode } from 'primevue/treenode';
+import { createCategorie } from '../api/modules/category';
 
 // 测试数据
 const testData: TreeNode[] = [
@@ -72,15 +73,42 @@ const selectedNode = ref<TreeNode | null>(null);
 // 菜单项
 const menuItems = ref<MenuItem[]>([]);
 
+// 自动生成分类名称
+const generateNewName = (existingNames: string[], baseName: string = '新建目录'): string => {
+  const regex = new RegExp(`^${baseName}(\\d*)$`);
+  let maxNum = -1;
+
+  existingNames.forEach(name => {
+    const match = name.match(regex);
+    if (match) {
+      const numStr = match[1];
+      const num = numStr ? parseInt(numStr, 10) : 0;
+      if (num > maxNum) maxNum = num;
+    }
+  });
+
+  // 处理没有匹配项或基础名称冲突的情况
+  if (maxNum === -1) {
+    return existingNames.includes(baseName) ? `${baseName}1` : baseName;
+  } else {
+    return `${baseName}${maxNum + 1}`;
+  }
+};
+
 // 点击三个点时显示菜单
 const toggleMenu = (event: Event, node: TreeNode) => {
   selectedNode.value = node;
   menuItems.value = [
     {
-      label: '编辑',
+      label: '新建笔记',
       icon: 'pi pi-pencil',
       command: () => {
-        console.log('编辑节点:', selectedNode.value?.label);
+      },
+    },
+    {
+      label: '新建分类',
+      icon: 'pi pi-pencil',
+      command: () => {
       },
     },
     {
