@@ -1,7 +1,7 @@
 // 创建分类请求参数
 export interface CreateCategoryRequest {
   name: string
-  parent_id: number
+  parent_id: string | null
 }
 
 // 创建笔记请求参数
@@ -27,6 +27,9 @@ export interface UpdateNoteRequest {
 export interface ApiResponse<T> {
   code: number
   data: T
+  status?: string
+  message?: string
+  error?: string
 }
 
 // 获取笔记列表
@@ -63,8 +66,14 @@ export interface GetNoteDetailResponse {
 
 // 笔记分类
 export interface Category {
+  id: string
   name: string
-  parent_id: number
+  parent_id: string | null
+  path?: string
+  created_at?: string
+  updated_at?: string
+  children?: Category[]
+  notes?: GetNotesResponse[]
 }
 
 // 笔记标签
