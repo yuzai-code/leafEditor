@@ -35,9 +35,6 @@
             <button class="text-gray-400 hover:text-gray-600 focus:outline-none mx-1" @click="addNewCategory">
               <i class="pi pi-plus text-xs"></i>
             </button>
-            <button class="text-gray-400 hover:text-gray-600 focus:outline-none" @click="toggleNavigation">
-              <i :class="['pi', navigationExpanded ? 'pi-chevron-down' : 'pi-chevron-right', 'text-xs']"></i>
-            </button>
           </div>
         </div>
 
