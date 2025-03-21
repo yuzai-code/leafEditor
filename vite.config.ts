@@ -32,4 +32,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  optimizeDeps: {
+    exclude: ['sql.js'],
+  },
+  build: {
+    target: 'esnext',
+    assetsInlineLimit: 0,
+  },
 })
