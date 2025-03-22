@@ -10,6 +10,8 @@ import FixedColum from './components/FixedColum.vue';
     <div class="flex-1 pl-13 bg-gray-100">
       <RouterView />
     </div>
+    <!-- 全局Toast通知组件 -->
+    <PrimeToast position="top-right" />
   </div>
 </template>
 

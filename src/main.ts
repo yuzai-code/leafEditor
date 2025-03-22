@@ -11,6 +11,11 @@ import PanelMenu from 'primevue/panelmenu'
 import Menu from 'primevue/menu'
 import ConfirmDialog from 'primevue/confirmdialog'
 import ConfirmationService from 'primevue/confirmationservice'
+import Dialog from 'primevue/dialog'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Toast from 'primevue/toast'
+import ToastService from 'primevue/toastservice'
 
 // 导入PrimeVue样式
 // 注意：在PrimeVue 4.x版本中，样式文件路径已更改
@@ -36,11 +41,16 @@ app.use(PrimeVue, {
   },
 })
 app.use(ConfirmationService)
+app.use(ToastService)
 
 // 全局注册PrimeVue组件
 app.component('PanelMenu', PanelMenu)
 app.component('PrimeMenu', Menu)
 app.component('ConfirmDialog', ConfirmDialog)
+app.component('PrimeDialog', Dialog)
+app.component('PrimeButton', Button)
+app.component('PrimeInputText', InputText)
+app.component('PrimeToast', Toast)
 
 // 挂载应用
 app.mount('#app')

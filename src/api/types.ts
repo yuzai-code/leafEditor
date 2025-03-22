@@ -17,8 +17,8 @@ export interface CreateNoteRequest {
   content: string
   yaml_meta: string
   file_path: string
-  category_id: number
-  tag_ids: number[]
+  category_id: string | number // 可以是字符串或数字
+  tag_ids: (string | number)[] // 可以是字符串或数字数组
 }
 
 // 更新笔记请求参数
@@ -26,8 +26,8 @@ export interface UpdateNoteRequest {
   title: string
   content: string
   yaml_meta: string
-  category_id: number
-  tag_ids: number[]
+  category_id: string | number // 可以是字符串或数字
+  tag_ids: (string | number)[] // 可以是字符串或数字数组
 }
 
 // 定义后端返回的数据类型

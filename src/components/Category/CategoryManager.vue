@@ -55,18 +55,32 @@
 
     <!-- 删除确认对话框 -->
     <ConfirmDialog></ConfirmDialog>
+    
+    <!-- 新建笔记对话框 -->
+    <NewNoteDialog 
+      v-model:visible="newNoteDialogVisible"
+      :category-id="selectedCategory.id"
+      :category-name="selectedCategory.name"
+      :category-path="selectedCategory.path"
+      @note-created="handleNoteCreated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch, reactive } from 'vue';
 import CategoryTree from './CategoryTree.vue';
 import { getCategories, createCategory, renameCategory, deleteCategory } from '../../api/modules/category';
-import type { Category, CreateCategoryRequest, RenameCategoryRequest } from '../../api/types';
+import { createNote } from '../../api/modules/notes';
+import type { Category, CreateCategoryRequest, RenameCategoryRequest, CreateNoteRequest } from '../../api/types';
 import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import NewNoteDialog from '../Notes/NewNoteDialog.vue';
 
 // 获取确认服务
 const confirm = useConfirm();
+// 获取通知服务
+const toast = useToast();
 
 // 树节点类型定义
 interface TreeNode {
@@ -119,6 +133,14 @@ const newRootCategoryName = ref('');
 const rootCategoryInputRef = ref<HTMLInputElement | null>(null);
 const isSaving = ref(false);
 
+// 新建笔记对话框状态
+const newNoteDialogVisible = ref(false);
+const selectedCategory = reactive({
+  id: '',
+  name: '',
+  path: ''
+});
+
 // 监听isAddingRootCategory状态变化，聚焦输入框
 watch(isAddingRootCategory, async (newValue) => {
   if (newValue) {
@@ -131,21 +153,87 @@ watch(isAddingRootCategory, async (newValue) => {
   }
 });
 
-// 加载分类数据
+// 加载分类数据 (保留此函数用于可能的未来场景)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const loadCategories = async () => {
   try {
     const response = await getCategories();
     console.log('获取分类数据:', response);
     if (response.code === 0 && response.data) {
-      // 构建分类树
-      categoryTree.value = buildCategoryTree(response.data);
+      // 构建包含笔记的分类树，确保每次都加载笔记
+      categoryTree.value = buildCategoryTreeWithNotes(response.data);
     }
   } catch (error) {
     console.error('加载分类失败:', error);
   }
 };
 
-// 构建分类树结构
+// 刷新分类树，确保包含新创建的笔记
+const refreshCategoryTreeWithNotes = async () => {
+  try {
+    const response = await getCategories();
+    console.log('刷新分类数据:', response);
+    if (response.code === 0 && response.data) {
+      // 保存展开状态，避免刷新后折叠所有分类
+      const expandedState = saveExpandedState(categoryTree.value);
+      
+      // 构建包含笔记的分类树
+      categoryTree.value = buildCategoryTreeWithNotes(response.data);
+      
+      // 恢复展开状态
+      restoreExpandedState(categoryTree.value, expandedState);
+    }
+  } catch (error) {
+    console.error('刷新分类和笔记失败:', error);
+  }
+};
+
+// 构建包含笔记的分类树
+const buildCategoryTreeWithNotes = (categories: Category[]): TreeNode[] => {
+  // 将分类数据转换为树节点，并包含笔记
+  const convertToTreeNode = (category: Category): TreeNode => {
+    // 创建分类节点
+    const categoryNode: TreeNode = {
+      id: category.id,
+      label: category.name,
+      icon: 'pi-folder',
+      expanded: false,
+      children: [],
+      nodeType: 'category'
+    };
+    
+    // 添加子分类
+    if (category.children && category.children.length > 0) {
+      categoryNode.children = category.children.map(convertToTreeNode);
+    } else {
+      categoryNode.children = [];
+    }
+    
+    // 添加该分类下的笔记
+    if (category.notes && category.notes.length > 0) {
+      const noteNodes = category.notes.map(note => ({
+        id: note.id.toString(),
+        label: note.title,
+        icon: 'pi-file',
+        nodeType: 'note' as 'category' | 'note' | 'system',
+        category_id: category.id
+      }));
+      
+      if (!categoryNode.children) {
+        categoryNode.children = noteNodes;
+      } else {
+        categoryNode.children = [...categoryNode.children, ...noteNodes];
+      }
+    }
+    
+    return categoryNode;
+  };
+  
+  return categories.map(convertToTreeNode);
+};
+
+// 构建分类树结构 (保留此函数用于未来可能需要只加载分类而不加载笔记的场景)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const buildCategoryTree = (categories: Category[]): TreeNode[] => {
   // 将分类数据转换为树节点
   const convertToTreeNode = (category: Category): TreeNode => {
@@ -253,7 +341,7 @@ const saveRootCategory = async () => {
     
     if (response.code === 0 || response.status === 'success') {
       // 重新加载分类
-      await loadCategories();
+      await refreshCategoryTreeWithNotes();
       
       // 恢复展开状态
       restoreExpandedState(categoryTree.value, expandedState);
@@ -296,8 +384,18 @@ const handleRootInputBlur = () => {
 
 // 处理分类点击事件
 const handleCategoryClick = (node: CategoryClickInfo) => {
-  console.log('分类点击:', node);
-  // 这里可以添加分类点击后的逻辑
+  console.log('节点点击:', node);
+  
+  // 根据节点类型进行不同处理
+  if (node.nodeType === 'note') {
+    // 处理笔记点击
+    console.log('笔记点击:', node.id, node.label);
+    // TODO: 实现打开笔记的逻辑
+  } else if (node.nodeType === 'category') {
+    // 处理分类点击
+    console.log('分类点击:', node.id, node.label);
+    // 可以在这里添加分类点击的逻辑，如显示分类下的笔记列表等
+  }
 };
 
 // 处理重命名分类
@@ -319,7 +417,7 @@ const handleRenameCategory = async (data: RenameData) => {
     if (response.code === 0 || response.status === 'success') {
       console.log('重命名成功:', response);
       // 重新加载分类或直接更新本地数据
-      await loadCategories();
+      await refreshCategoryTreeWithNotes();
       
       // 恢复展开状态
       restoreExpandedState(categoryTree.value, expandedState);
@@ -360,7 +458,7 @@ const handleContextMenuAction = async (data: ContextMenuAction | { action: Conte
   switch (action) {
     case 'create-note':
       console.log('创建笔记在分类:', node.id);
-      // TODO: 实现创建笔记的逻辑
+      await handleCreateNote(node);
       break;
       
     case 'create-category':
@@ -386,6 +484,199 @@ const handleContextMenuAction = async (data: ContextMenuAction | { action: Conte
     default:
       console.log('未知操作:', { action, node });
   }
+};
+
+// 处理创建笔记
+const handleCreateNote = async (node: ContextMenuAction['node']) => {
+  try {
+    // 获取分类信息
+    const categoryId = node.id;
+    console.log('准备创建笔记的分类ID:', categoryId, '类型:', typeof categoryId);
+    
+    // 判断是否是从分类树直接创建的笔记
+    if (node.isNewNote) {
+      console.log('从分类树直接创建笔记:', node);
+      
+      // 这里是问题所在：应该使用parentId作为实际的categoryId
+      // 当在分类下创建笔记时，node.id为空字符串，而真正的分类ID是在parentId字段中
+      const actualCategoryId = (node.parentId as string) || categoryId;
+      
+      // 确保分类ID有效
+      if (!actualCategoryId) {
+        console.error('无效的分类ID（直接创建模式）');
+        toast.add({
+          severity: 'error',
+          summary: '操作失败',
+          detail: '无法创建笔记：无效的分类ID',
+          life: 3000
+        });
+        
+        // 通知组件创建失败
+        if (typeof node.callback === 'function') {
+          node.callback(false);
+        }
+        return;
+      }
+      
+      // 更新selectedCategory对象，用于笔记创建
+      selectedCategory.id = actualCategoryId;
+      selectedCategory.name = node.parentId ? node.parentId.toString() : '';
+      
+      // 尝试获取分类路径
+      try {
+        const response = await getCategories();
+        if (response.code === 0 && response.data) {
+          // 找到对应的分类
+          const findCategoryPath = (categories: Category[], id: string): string | null => {
+            for (const category of categories) {
+              if (category.id === id) {
+                return category.path || `/${category.name}`;
+              }
+              
+              if (category.children && category.children.length > 0) {
+                const path = findCategoryPath(category.children, id);
+                if (path) {
+                  return path;
+                }
+              }
+            }
+            
+            return null;
+          };
+          
+          // 使用actualCategoryId查找分类路径
+          const path = findCategoryPath(response.data, actualCategoryId);
+          if (path) {
+            selectedCategory.path = path;
+          }
+        }
+      } catch (error) {
+        console.error('获取分类路径失败:', error);
+      }
+      
+      // 直接创建笔记，不弹出对话框
+      const noteTitle = node.label || '新建笔记';
+      const filePath = `${selectedCategory.path || '/'}/${noteTitle}.md`;
+      
+      // 构建创建笔记请求参数
+      const createNoteData: CreateNoteRequest = {
+        title: noteTitle,
+        content: '',  // 初始内容为空
+        yaml_meta: '',  // 初始yaml元数据为空
+        file_path: filePath,
+        category_id: actualCategoryId,
+        tag_ids: []  // 初始标签为空
+      };
+      
+      // 调用API创建笔记
+      console.log('直接创建笔记:', createNoteData);
+      const response = await createNote(createNoteData);
+      
+      if (response.code === 0 && response.data) {
+        // 创建成功
+        console.log('笔记创建成功:', response.data);
+        
+        // 回调通知分类树组件
+        if (typeof node.callback === 'function') {
+          node.callback(true);
+        }
+        
+        // 刷新分类树，确保新创建的笔记显示在目录树中
+        refreshCategoryTreeWithNotes();
+        
+        // 显示成功提示
+        toast.add({
+          severity: 'success',
+          summary: '操作成功',
+          detail: `笔记 "${noteTitle}" 创建成功`,
+          life: 3000
+        });
+      } else {
+        // 创建失败
+        console.error('笔记创建失败:', response);
+        
+        // 回调通知分类树组件
+        if (typeof node.callback === 'function') {
+          node.callback(false);
+        }
+        
+        // 显示错误提示
+        toast.add({
+          severity: 'error',
+          summary: '操作失败',
+          detail: `笔记创建失败: ${response.message || '未知错误'}`,
+          life: 3000
+        });
+      }
+      
+      return;
+    }
+    
+    // 使用对话框创建笔记的旧代码
+    // 更新selectedCategory对象，用于新建笔记对话框
+    selectedCategory.id = categoryId;
+    selectedCategory.name = node.label;
+    
+    // 尝试从完整的分类数据中获取更准确的路径信息
+    const response = await getCategories();
+    if (response.code === 0 && response.data) {
+      // 找到对应的分类
+      const findCategoryPath = (categories: Category[], id: string): string | null => {
+        for (const category of categories) {
+          if (category.id === id) {
+            selectedCategory.path = category.path || `/${category.name}`;
+            return category.path || `/${category.name}`;
+          }
+          
+          if (category.children && category.children.length > 0) {
+            const path = findCategoryPath(category.children, id);
+            if (path) {
+              return path;
+            }
+          }
+        }
+        
+        return null;
+      };
+      
+      const path = findCategoryPath(response.data, categoryId);
+      if (path) {
+        selectedCategory.path = path;
+      }
+    }
+    
+    console.log('准备打开新建笔记对话框，分类信息:', selectedCategory);
+    
+    // 显示新建笔记对话框
+    newNoteDialogVisible.value = true;
+    
+    // 剩下的代码先不执行，改为从对话框创建笔记
+    return;
+  } catch (error) {
+    console.error('创建笔记失败:', error);
+    toast.add({
+      severity: 'error',
+      summary: '操作失败',
+      detail: '准备创建笔记时发生错误',
+      life: 3000
+    });
+  }
+};
+
+// 处理笔记创建成功
+const handleNoteCreated = (note: import('../../api/types').GetNoteDetailResponse) => {
+  console.log('笔记创建成功:', note);
+  
+  // 刷新分类树，确保新创建的笔记显示在目录树中
+  refreshCategoryTreeWithNotes();
+  
+  // 显示成功提示
+  toast.add({
+    severity: 'success',
+    summary: '操作成功',
+    detail: `笔记 "${note.title}" 创建成功`,
+    life: 3000
+  });
 };
 
 // 处理创建分类操作
@@ -420,7 +711,7 @@ const handleCreateCategory = async (node: ContextMenuAction['node']) => {
       
       if (response.code === 0 || response.status === 'success') {
         // 重新加载分类
-        await loadCategories();
+        await refreshCategoryTreeWithNotes();
         
         // 恢复展开状态
         restoreExpandedState(categoryTree.value, expandedState);
@@ -467,7 +758,7 @@ const handleDeleteCategory = async (node: ContextMenuAction['node']) => {
         
         if (response.code === 0 || response.status === 'success') {
           // 重新加载分类
-          await loadCategories();
+          await refreshCategoryTreeWithNotes();
           
           // 恢复展开状态
           restoreExpandedState(categoryTree.value, expandedState);
@@ -563,12 +854,13 @@ const handleNodeToggle = (data: { id: string; expanded: boolean }) => {
 
 // 组件挂载时加载数据
 onMounted(() => {
-  loadCategories();
+  // 使用refreshCategoryTreeWithNotes代替loadCategories，确保每次都加载笔记
+  refreshCategoryTreeWithNotes();
 });
 
 // 公开方法供父组件调用
 defineExpose({
-  loadCategories,
+  refreshCategoryTree: refreshCategoryTreeWithNotes, // 提供刷新分类树的方法
   toggleExpand: () => {
     isExpanded.value = !isExpanded.value;
   }
