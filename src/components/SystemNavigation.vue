@@ -76,7 +76,8 @@ const menuItems = computed(() => {
   return systemNodes.map(node => ({
     label: node.label,
     icon: `pi ${node.icon}`,
-    command: () => handleNodeClick(node)
+    command: () => handleNodeClick(node),
+    class: 'system-nav-item'
   }));
 });
 
@@ -93,36 +94,110 @@ const handleNodeClick = (node: NavNode) => {
 </script>
 
 <style scoped>
+/* 基础菜单样式 */
 :deep(.sidebar-panel-menu) {
   border: none;
   background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 去除所有边框和箭头 */
+:deep(.sidebar-panel-menu .p-panelmenu-header) {
+  margin-bottom: 0;
+  border: none;
 }
 
 :deep(.sidebar-panel-menu .p-panelmenu-header-link) {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   border: none;
   background: transparent;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  color: #4b5563; /* text-gray-600 */
+  display: flex;
+  align-items: center;
+}
+
+:deep(.sidebar-panel-menu .p-panelmenu-header-link:focus) {
+  box-shadow: none;
+  outline: none;
 }
 
 :deep(.sidebar-panel-menu .p-panelmenu-header-link:hover) {
-  background-color: #f9fafb;
+  background-color: rgba(243, 244, 246, 0.8); /* lighter hover state */
+  color: #1f2937; /* text-gray-800 */
 }
 
+:deep(.sidebar-panel-menu .p-panelmenu-header-link.p-highlight) {
+  background-color: rgba(238, 242, 255, 0.8); /* light indigo background */
+  color: #4f46e5; /* indigo-600 */
+}
+
+/* 内容区域样式 */
 :deep(.sidebar-panel-menu .p-panelmenu-content) {
   border: none;
   background: transparent;
+  padding: 0;
+}
+
+/* 菜单项样式 */
+:deep(.sidebar-panel-menu .p-menuitem) {
+  margin: 0.25rem 0;
 }
 
 :deep(.sidebar-panel-menu .p-menuitem-link) {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  color: #4b5563; /* text-gray-600 */
+}
+
+:deep(.sidebar-panel-menu .p-menuitem-link:focus) {
+  box-shadow: none;
+  outline: none;
 }
 
 :deep(.sidebar-panel-menu .p-menuitem-link:hover) {
-  background-color: #f9fafb;
+  background-color: rgba(243, 244, 246, 0.8); /* lighter hover state */
+  color: #1f2937; /* text-gray-800 */
 }
 
+:deep(.sidebar-panel-menu .p-menuitem-link.p-highlight) {
+  background-color: rgba(238, 242, 255, 0.8); /* light indigo background */
+  color: #4f46e5; /* indigo-600 */
+}
+
+/* 当前活动菜单项 */
+:deep(.sidebar-panel-menu .p-menuitem.p-highlight) {
+  background-color: rgba(238, 242, 255, 0.8); /* light indigo background */
+}
+
+/* 图标样式 */
 :deep(.sidebar-panel-menu .p-menuitem-icon) {
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
+  color: #6b7280; /* text-gray-500 */
+  font-size: 1rem;
+  width: 1.25rem;
+  text-align: center;
+}
+
+:deep(.sidebar-panel-menu .p-menuitem-link:hover .p-menuitem-icon) {
+  color: #4f46e5; /* indigo-600 on hover */
+}
+
+:deep(.sidebar-panel-menu .p-menuitem-link.p-highlight .p-menuitem-icon) {
+  color: #4f46e5; /* indigo-600 when active */
+}
+
+/* 文本样式 */
+:deep(.sidebar-panel-menu .p-menuitem-text) {
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500; /* font-medium */
+}
+
+/* 去除折叠展开图标 */
+:deep(.sidebar-panel-menu .p-submenu-icon) {
+  display: none;
 }
 
 /* 系统导航内容区域样式 */
@@ -130,6 +205,7 @@ const handleNodeClick = (node: NavNode) => {
   max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 0 0.5rem;
 }
 
 /* 自定义滚动条样式 */
