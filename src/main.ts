@@ -18,49 +18,27 @@ import 'primeicons/primeicons.css'
 // 创建 Pinia 存储
 const pinia = createPinia()
 
-/**
- * 初始化应用
- */
-async function initApp() {
-  try {
-    console.log('正在初始化 SQLite 数据库...')
+// 创建 Vue 应用
+const app = createApp(App)
 
-    // 初始化 SQLite 数据库
-    await SqliteClient.getInstance().init()
+app.use(pinia)
+app.use(router)
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+    options: {
+      prefix: 'p',
+      darkModeSelector: 'system',
+      cssLayer: false,
+    },
+  },
+})
 
-    // 预加载数据提供者
-    await DataProviderFactory.getInstance().getDataProvider()
+// 全局注册PrimeVue组件
+app.component('PanelMenu', PanelMenu)
+// 全局注册PrimeVue组件
+app.component('PanelMenu', PanelMenu)
+app.component('PrimeMenu', Menu)
 
-    console.log('SQLite 数据库初始化成功')
-
-    // 创建 Vue 应用
-    const app = createApp(App)
-
-    app.use(pinia)
-    app.use(router)
-    app.use(PrimeVue, {
-      theme: {
-        preset: Aura,
-        options: {
-          prefix: 'p',
-          darkModeSelector: 'system',
-          cssLayer: false,
-        },
-      },
-    })
-
-    // 全局注册PrimeVue组件
-    app.component('PanelMenu', PanelMenu)
-    // 全局注册PrimeVue组件
-    app.component('PanelMenu', PanelMenu)
-    app.component('PrimeMenu', Menu)
-
-    // 挂载应用
-    app.mount('#app')
-  } catch (error) {
-    console.error('应用初始化失败:', error)
-  }
-}
-
-// 启动应用
-initApp()
+// 挂载应用
+app.mount('#app')
