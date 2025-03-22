@@ -71,7 +71,7 @@
 import { ref, onMounted, nextTick, watch, reactive } from 'vue';
 import CategoryTree from './CategoryTree.vue';
 import { getCategories, createCategory, renameCategory, deleteCategory } from '../../api/modules/category';
-import { createNote } from '../../api/modules/notes';
+import { createNote, deleteNote } from '../../api/modules/notes';
 import type { Category, CreateCategoryRequest, RenameCategoryRequest, CreateNoteRequest } from '../../api/types';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
@@ -471,6 +471,11 @@ const handleContextMenuAction = async (data: ContextMenuAction | { action: Conte
       await handleDeleteCategory(node);
       break;
       
+    case 'delete-note':
+      console.log('删除笔记:', node.id);
+      await handleDeleteNote(node);
+      break;
+      
     case 'rename-category':
       console.log('重命名分类:', node.id);
       // 这里不需要处理，因为直接在 CategoryItem 中处理了重命名
@@ -584,13 +589,7 @@ const handleCreateNote = async (node: ContextMenuAction['node']) => {
         // 刷新分类树，确保新创建的笔记显示在目录树中
         refreshCategoryTreeWithNotes();
         
-        // 显示成功提示
-        toast.add({
-          severity: 'success',
-          summary: '操作成功',
-          detail: `笔记 "${noteTitle}" 创建成功`,
-          life: 3000
-        });
+
       } else {
         // 创建失败
         console.error('笔记创建失败:', response);
@@ -670,13 +669,13 @@ const handleNoteCreated = (note: import('../../api/types').GetNoteDetailResponse
   // 刷新分类树，确保新创建的笔记显示在目录树中
   refreshCategoryTreeWithNotes();
   
-  // 显示成功提示
-  toast.add({
-    severity: 'success',
-    summary: '操作成功',
-    detail: `笔记 "${note.title}" 创建成功`,
-    life: 3000
-  });
+//   // 显示成功提示
+//   toast.add({
+//     severity: 'success',
+//     summary: '操作成功',
+//     detail: `笔记 "${note.title}" 创建成功`,
+//     life: 3000
+//   });
 };
 
 // 处理创建分类操作
@@ -784,6 +783,85 @@ const handleDeleteCategory = async (node: ContextMenuAction['node']) => {
     },
     reject: () => {
       console.log('取消删除分类');
+    }
+  });
+};
+
+// 处理删除笔记
+const handleDeleteNote = async (node: ContextMenuAction['node']) => {
+  confirm.require({
+    message: `确定要删除笔记 "${node.label}" 吗？`,
+    header: '删除确认',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    acceptLabel: '确定删除',
+    rejectLabel: '取消',
+    accept: async () => {
+      try {
+        console.log('发送删除笔记请求:', node.id);
+        
+        // 检查笔记ID是否有效
+        if (!node.id) {
+          throw new Error('无效的笔记ID');
+        }
+        
+        // 直接使用笔记ID，不进行转换
+        const noteId = node.id;
+        
+        const response = await deleteNote(noteId);
+        console.log('删除笔记响应:', response);
+        
+        if (response.code === 0 || response.status === 'success') {
+          // 显示成功提示
+          toast.add({
+            severity: 'success',
+            summary: '操作成功',
+            detail: `笔记 "${node.label}" 已删除`,
+            life: 3000
+          });
+          
+          // 刷新分类树，确保删除的笔记不再显示
+          await refreshCategoryTreeWithNotes();
+          
+          // 如果有回调函数，调用它
+          if (node.callback) {
+            node.callback(true);
+          }
+        } else {
+          console.error('删除笔记失败:', response);
+          
+          // 显示错误提示
+          toast.add({
+            severity: 'error',
+            summary: '操作失败',
+            detail: `删除笔记失败: ${response.message || '未知错误'}`,
+            life: 3000
+          });
+          
+          // 如果有回调函数，调用它
+          if (node.callback) {
+            node.callback(false);
+          }
+        }
+      } catch (error) {
+        console.error('删除笔记失败:', error);
+        
+        // 显示错误提示
+        toast.add({
+          severity: 'error',
+          summary: '操作失败',
+          detail: '删除笔记时发生错误',
+          life: 3000
+        });
+        
+        // 如果有回调函数，调用它
+        if (node.callback) {
+          node.callback(false);
+        }
+      }
+    },
+    reject: () => {
+      console.log('取消删除笔记');
     }
   });
 };

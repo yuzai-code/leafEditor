@@ -16,7 +16,7 @@ export interface DataProvider {
   // 笔记相关操作
   createNote(data: CreateNoteRequest): Promise<GetNoteDetailResponse>
   updateNote(id: number, data: UpdateNoteRequest): Promise<GetNoteDetailResponse>
-  deleteNote(id: number): Promise<void>
+  deleteNote(id: string | number): Promise<void>
   getNotes(): Promise<GetNotesResponse[]>
   getNoteDetail(id: number): Promise<GetNoteDetailResponse>
 

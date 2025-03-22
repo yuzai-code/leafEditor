@@ -94,7 +94,7 @@ export async function apiUpdateNote(
   }
 }
 
-export async function apiDeleteNote(id: number): Promise<ApiResponse<void>> {
+export async function apiDeleteNote(id: string | number): Promise<ApiResponse<void>> {
   try {
     const factory = DataProviderFactory.getInstance()
     const provider = await factory.getDataProvider()

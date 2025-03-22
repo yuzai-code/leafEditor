@@ -16,8 +16,8 @@ export const updateNote = async (id: number, data: UpdateNoteRequest) => {
   return request<GetNoteDetailResponse>('put', `/notes/${id}`, data)
 }
 
-// 删除笔记
-export const deleteNote = async (id: number) => {
+// 删除笔记 - 修改为接收字符串ID，因为ID可能是UUID格式
+export const deleteNote = async (id: string | number) => {
   return request<void>('delete', `/notes/${id}`)
 }
 

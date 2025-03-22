@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, computed } from 'vue';
 // 由于已经全局注册了PrimeMenu，不需要再导入
 // import Menu from 'primevue/menu';
 
@@ -20,43 +20,72 @@ const emit = defineEmits([
   'create-category', 
   'delete-category',
   'rename-category',
-  'move-category'
+  'move-category',
+  'delete-note'
 ]);
 
 // 菜单引用，使用更明确的类型
 const menuRef = ref<{ toggle: (event: Event) => void } | null>(null);
 
-// 菜单项定义
-const menuItems = ref([
-  {
-    label: '新建笔记',
-    icon: 'pi pi-file',
-    command: () => emit('create-note', props.node),
-  },
-  {
-    label: '新建文件夹',
-    icon: 'pi pi-folder-open',
-    command: () => emit('create-category', props.node)
-  },
-  { separator: true },
-  {
-    label: '重命名',
-    icon: 'pi pi-pencil',
-    command: () => emit('rename-category', props.node)
-  },
-  {
-    label: '移动到',
-    icon: 'pi pi-arrows-alt',
-    command: () => emit('move-category', props.node)
-  },
-  { separator: true },
-  {
-    label: '删除',
-    icon: 'pi pi-trash',
-    class: 'text-red-500',
-    command: () => emit('delete-category', props.node)
+// 根据节点类型计算菜单项
+const menuItems = computed(() => {
+  const nodeType = props.node.nodeType;
+  
+  // 笔记节点的菜单项
+  if (nodeType === 'note') {
+    return [
+      {
+        label: '重命名',
+        icon: 'pi pi-pencil',
+        command: () => emit('rename-category', props.node)
+      },
+      {
+        label: '移动到',
+        icon: 'pi pi-arrows-alt',
+        command: () => emit('move-category', props.node)
+      },
+      { separator: true },
+      {
+        label: '删除',
+        icon: 'pi pi-trash',
+        class: 'text-red-500',
+        command: () => emit('delete-note', props.node)
+      }
+    ];
   }
-]);
+  
+  // 分类节点的默认菜单项
+  return [
+    {
+      label: '新建笔记',
+      icon: 'pi pi-file',
+      command: () => emit('create-note', props.node),
+    },
+    {
+      label: '新建文件夹',
+      icon: 'pi pi-folder-open',
+      command: () => emit('create-category', props.node)
+    },
+    { separator: true },
+    {
+      label: '重命名',
+      icon: 'pi pi-pencil',
+      command: () => emit('rename-category', props.node)
+    },
+    {
+      label: '移动到',
+      icon: 'pi pi-arrows-alt',
+      command: () => emit('move-category', props.node)
+    },
+    { separator: true },
+    {
+      label: '删除',
+      icon: 'pi pi-trash',
+      class: 'text-red-500',
+      command: () => emit('delete-category', props.node)
+    }
+  ];
+});
 
 // 显示菜单
 const show = (event: Event) => {
