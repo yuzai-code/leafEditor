@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import FixedColum from './components/FixedColum.vue';
-import Button from 'primevue/button'
 </script>
 
 <template>

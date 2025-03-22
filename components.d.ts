@@ -8,6 +8,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ApiExample: typeof import('./src/components/ApiExample.vue')['default']
+    CategoryContextMenu: typeof import('./src/components/Category/CategoryContextMenu.vue')['default']
+    CategoryItem: typeof import('./src/components/Category/CategoryItem.vue')['default']
+    CategoryItemMenu: typeof import('./src/components/CategoryItemMenu.vue')['default']
+    CategoryManager: typeof import('./src/components/Category/CategoryManager.vue')['default']
+    CategoryTree: typeof import('./src/components/Category/CategoryTree.vue')['default']
+    ContextMenu: typeof import('primevue/contextmenu')['default']
     EditorText: typeof import('./src/components/EditorText.vue')['default']
     FixedColum: typeof import('./src/components/FixedColum.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
@@ -21,5 +28,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SidebarLayout: typeof import('./src/components/SidebarLayout.vue')['default']
+    SystemNavigation: typeof import('./src/components/SystemNavigation.vue')['default']
+    UserInfo: typeof import('./src/components/UserInfo.vue')['default']
   }
 }
