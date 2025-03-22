@@ -10,8 +10,8 @@
       </div>
     </div>
 
-    <!-- 侧边栏内容区域 -->
-    <div class="flex-1 overflow-y-auto">
+    <!-- 侧边栏内容区域 - 确保内容不溢出 -->
+    <div class="flex-1 sidebar-content">
       <!-- 系统导航 -->
       <SystemNavigation class="mb-3" />
 
@@ -19,7 +19,6 @@
       <CategoryManager class="mb-3" />
     </div>
     
-    <!-- 用户信息 -->
     <UserInfo />
   </div>
 </template>
@@ -27,16 +26,27 @@
 <script setup lang="ts">
 import SystemNavigation from '../components/SystemNavigation.vue';
 import CategoryManager from '../components/Category/CategoryManager.vue';
-import UserInfo from '../components/UserInfo.vue';
+// 注释掉未使用的导入
+// import UserInfo from '../components/UserInfo.vue';
 </script>
 
 <style scoped>
-/* 确保 sidebar-container 有明确的宽度和定位上下文 */
+/* 确保 sidebar-container 有明确的高度和定位上下文 */
 .sidebar-container {
   position: relative;
   width: 100%;
+  height: 100%;
   border-right: 1px solid #e5e7eb;
   background-color: #fffefb;
+  overflow: hidden; /* 防止整体溢出 */
+}
+
+/* 侧边栏内容区域样式 */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden; /* 防止整体滚动 */
+  height: calc(100% - 40px); /* 减去标题栏高度 */
 }
 
 /* 自定义滚动条 */

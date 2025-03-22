@@ -11,7 +11,7 @@
     </div>
 
     <!-- 系统导航菜单 -->
-    <div v-if="expanded">
+    <div v-if="expanded" class="system-nav-content">
       <PanelMenu :model="menuItems" class="w-full sidebar-panel-menu" />
     </div>
   </div>
@@ -123,5 +123,30 @@ const handleNodeClick = (node: NavNode) => {
 
 :deep(.sidebar-panel-menu .p-menuitem-icon) {
   margin-right: 0.5rem;
+}
+
+/* 系统导航内容区域样式 */
+.system-nav-content {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 自定义滚动条样式 */
+.system-nav-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.system-nav-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.system-nav-content::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+.system-nav-content::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
 }
 </style> 

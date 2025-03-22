@@ -9,6 +9,8 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import PanelMenu from 'primevue/panelmenu'
 import Menu from 'primevue/menu'
+import ConfirmDialog from 'primevue/confirmdialog'
+import ConfirmationService from 'primevue/confirmationservice'
 
 // 导入PrimeVue样式
 // 注意：在PrimeVue 4.x版本中，样式文件路径已更改
@@ -33,12 +35,12 @@ app.use(PrimeVue, {
     },
   },
 })
+app.use(ConfirmationService)
 
 // 全局注册PrimeVue组件
 app.component('PanelMenu', PanelMenu)
-// 全局注册PrimeVue组件
-app.component('PanelMenu', PanelMenu)
 app.component('PrimeMenu', Menu)
+app.component('ConfirmDialog', ConfirmDialog)
 
 // 挂载应用
 app.mount('#app')

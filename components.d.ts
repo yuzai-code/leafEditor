@@ -14,6 +14,7 @@ declare module 'vue' {
     CategoryItemMenu: typeof import('./src/components/CategoryItemMenu.vue')['default']
     CategoryManager: typeof import('./src/components/Category/CategoryManager.vue')['default']
     CategoryTree: typeof import('./src/components/Category/CategoryTree.vue')['default']
+    ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     ContextMenu: typeof import('primevue/contextmenu')['default']
     EditorText: typeof import('./src/components/EditorText.vue')['default']
     FixedColum: typeof import('./src/components/FixedColum.vue')['default']

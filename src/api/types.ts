@@ -4,6 +4,13 @@ export interface CreateCategoryRequest {
   parent_id: string | null
 }
 
+// 更新分类请求参数
+export interface RenameCategoryRequest {
+  category_id: string // 这个是路径参数，不是请求体的一部分
+  name: string // 新名称，与API文档一致
+  parent_id?: string | null // 可选的父分类ID，与API文档一致
+}
+
 // 创建笔记请求参数
 export interface CreateNoteRequest {
   title: string

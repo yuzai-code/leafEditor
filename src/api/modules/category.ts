@@ -1,5 +1,5 @@
 import { request } from '../requests'
-import type { Category, CreateCategoryRequest } from '../types'
+import type { Category, CreateCategoryRequest, RenameCategoryRequest } from '../types'
 
 // 获取所有分类
 export const getCategories = async () => {
@@ -29,5 +29,19 @@ export const getCategories = async () => {
 export const createCategory = async (data: CreateCategoryRequest) => {
   const response = await request<Category>('post', '/categories', data)
   console.log('创建分类响应:', response)
+  return response
+}
+
+// 重命名分类
+export const renameCategory = async (data: RenameCategoryRequest) => {
+  const response = await request<Category>('put', `/categories/${data.category_id}`, data)
+  console.log('重命名分类响应:', response)
+  return response
+}
+
+// 删除分类
+export const deleteCategory = async (categoryId: string) => {
+  const response = await request<{ message: string }>('delete', `/categories/${categoryId}`)
+  console.log('删除分类响应:', response)
   return response
 }
