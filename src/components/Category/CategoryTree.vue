@@ -183,6 +183,7 @@ watch(isAddingChildTo, async (newValue, oldValue) => {
 
 // 处理项点击
 const onItemClick = (node: {id: string; label: string; nodeType: string}) => {
+  // 仅发送项目点击事件，折叠/展开由 CategoryItem 通过 toggle-expand 事件处理
   emit('item-click', node);
 };
 

@@ -4,19 +4,19 @@
     @mouseenter="showMoreButton = true"
     @mouseleave="showMoreButton = false"
     :data-id="id"
+    @click="handleItemClick"
   >
     <!-- 分类前的展开/折叠图标，仅当有子项时显示 -->
     <div 
       v-if="hasChildren" 
       class="expand-icon w-4 flex justify-center mr-1"
-      @click.stop="toggleExpand"
     >
       <i :class="['pi', expanded ? 'pi-chevron-down' : 'pi-chevron-right', 'text-xs text-gray-400']"></i>
     </div>
     <div v-else class="w-4 mr-1"></div>
     
     <!-- 分类图标和标签 - 编辑模式 -->
-    <div v-if="isEditing" class="flex-1 flex items-center">
+    <div v-if="isEditing" class="flex-1 flex items-center" @click.stop>
       <i :class="['pi', `${icon}`, 'mr-2 text-gray-500']"></i>
       <input
         v-model="editingLabel"
@@ -33,7 +33,7 @@
     </div>
     
     <!-- 分类图标和标签 - 正常模式 -->
-    <div v-else class="flex-1 flex items-center" @click.stop="handleItemClick">
+    <div v-else class="flex-1 flex items-center">
       <i :class="['pi', `${icon}`, 'mr-2 text-gray-500']"></i>
       <span class="text-gray-700 text-sm truncate">{{ label }}</span>
     </div>
@@ -96,14 +96,14 @@ const isSaving = ref(false);
 
 // 处理项点击
 const handleItemClick = () => {
-  // 发出项目点击事件
+  // 发出项目点击事件 (用于其他可能的操作，如选择项)
   emit('item-click', {
     id: props.id,
     label: props.label,
     nodeType: props.nodeType
   });
   
-  // 如果有子项，同时触发展开/折叠
+  // 如果有子项，触发展开/折叠
   if (props.hasChildren) {
     toggleExpand();
   }
